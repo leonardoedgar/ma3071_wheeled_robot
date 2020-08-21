@@ -12,8 +12,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Install python packages
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-	python3-numpy python3-matplotlib python3-tk --no-install-recommends \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+	python3-numpy python3-matplotlib python3-tk python3-pytest python3-pytest-mock \ 
 	&& rm -rf /var/lib/apt/lists/*
 
 # User and permissions
