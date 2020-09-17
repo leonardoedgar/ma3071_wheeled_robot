@@ -9,7 +9,7 @@ services:
         GROUP: ${dGROUP}
         UID: ${dUID}
         GID: ${dGID}
-    image: leonardoedgar/wheeled-robot-master
+    image: leonardoedgar/wheeled-robot:master-${VERSION}
     container_name: master
     network_mode: "host"
     environment:
@@ -17,6 +17,6 @@ services:
     shm_size: 256M
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - ../simulation.py:/home/${dUSER}/simulation.py
+      - ../:/home/${dUSER}/
     stop_signal: SIGINT
     command: sleep infinity
