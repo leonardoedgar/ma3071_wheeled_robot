@@ -17,7 +17,10 @@ AIN2 = 27  # left backward
 PWMB = 23  # PWM signal (setting the right motor speed)
 BIN1 = 25  # right forward
 BIN2 = 24  # right backward
-
+# pins for infrared sensors
+# =============================================================================
+IRLEFT = 12
+IRRIGHT = 16
 
 def car_stop(t_time):
     """ stop the car
@@ -65,6 +68,8 @@ def initialise_gpio():
     GPIO.setup(BIN1, GPIO.OUT)
     GPIO.setup(BIN2, GPIO.OUT)
     GPIO.setup(PWMB, GPIO.OUT)
+    GPIO.setup(IRLEFT, GPIO.IN)
+    GPIO.setup(IRRIGHT, GPIO.IN)
 
 
 if __name__ == '__main__':
@@ -77,6 +82,7 @@ if __name__ == '__main__':
 
     planner = Planner()
     q_start = 0.0, 0.0, np.deg2rad(0.0)
+
     # start motion
     try:
         while True:
@@ -88,10 +94,16 @@ if __name__ == '__main__':
             except ValueError:
                 raise Exception("Invalid Input")
             else:
+                car_stop(7)
                 planner.init_plan(q_start=q_start, q_goal=(x, y, np.deg2rad(theta)))
                 trajectories = planner.plan_path()
                 for left_velocity, right_velocity, total_time in trajectories:
-                    car_motion(left_velocity/10.0, right_velocity/10.0, total_time)
+                    start_time = time.time()
+                    while time.time() - start_time < total_time:
+                        if not (GPIO.input(IRLEFT) and GPIO.input(IRRIGHT)):
+                            car_stop(3)
+                            raise Exception("Obstacles detected")
+                        car_motion(left_velocity/10.0, right_velocity/10.0, 0.1)
                 car_stop(10)
                 break
     except KeyboardInterrupt or Exception:
